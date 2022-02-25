@@ -1,0 +1,48 @@
+let serverUrl = "https://ipggf3lltmw3.usemoralis.com:2053/server"; //Server url from moralis.io
+let appId =  "3b9lPAiTrELmjeW2gN3EZASJDSxn6uACfZ5Boo5P"; // Application id from moralis.io
+Moralis.start({ serverUrl, appId});
+
+let contract_addr = "0xE371C77850b55086660B896d2539d54bd3BB2a3e"
+
+let web3;
+
+async function init() {
+    let currentUser = Moralis.User.current();
+    if (!currentUser) {
+        window.location.pathname = "/index.html";
+    }
+
+    web3 = await Moralis.Web3.enable();
+    let accounts = await web3.eth.getAccounts();
+    console.log(accounts)
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const nftId = urlParams.get("nftId");
+    document.getElementById("token_id_input").value = nftId;
+    document.getElementById("address_input").value = accounts[0];
+}
+
+async function mint() {
+    let tokenId = parseInt(document.getElementById("token_id_input").value);
+    let address = document.getElementById("address_input").value;
+    let amount = parseInt(document.getElementById("amount_input").value);
+
+    console.log(tokenId)
+    console.log(address)
+    console.log(amount)
+
+    const accounts = await web3.eth.getAccounts();
+    const contract = new web3.eth.Contract(contractAbi, contract_addr);
+
+    console.log(accounts[0])
+    console.log(contract)
+
+    contract.methods.mint(address, tokenId, amount).send({from: accounts[0], value: 0})
+    .on("receipt", function(receipt) {
+        alert("Mint done!")
+    })
+}
+
+document.getElementById("submit_mint").onclick = mint;
+
+init();
