@@ -1,9 +1,17 @@
-let serverUrl = "https://ipggf3lltmw3.usemoralis.com:2053/server"; //Server url from moralis.io
-let appId =  "3b9lPAiTrELmjeW2gN3EZASJDSxn6uACfZ5Boo5P"; // Application id from moralis.io
+let serverUrl = "https://iftypmmzcbls.usemoralis.com:2053/server"; //Server url from moralis.io
+let appId =  "q8lpxiimokbF2QWHjIqExgtZNSwwRDDGiDQQWy57"; // Application id from moralis.io
 Moralis.start({ serverUrl, appId});
 
 let contract_addr = "0xE371C77850b55086660B896d2539d54bd3BB2a3e"
 let currentUser;
+
+function sleep(milliseconds) {
+    const date = Date.now();
+    let currentDate = null;
+    do {
+      currentDate = Date.now();
+    } while (currentDate - date < milliseconds);
+}
 
 function fetchNFTMetadata(NFTs) {
     let promises = [];
@@ -12,12 +20,13 @@ function fetchNFTMetadata(NFTs) {
         let nft = NFTs[i];
         let id = nft.token_id;
         // Call Moralis Cloud function -> static JSON file
-        promises.push(fetch("https://ipggf3lltmw3.usemoralis.com:2053/server/functions/getNFT?_ApplicationId=3b9lPAiTrELmjeW2gN3EZASJDSxn6uACfZ5Boo5P&nftId=" + id)
+        promises.push(fetch("https://iftypmmzcbls.usemoralis.com:2053/server/functions/getNFT?_ApplicationId=q8lpxiimokbF2QWHjIqExgtZNSwwRDDGiDQQWy57&nftId=" + id)
         .then(res => res.json())
         .then(res => JSON.parse(res.result))
         .then(res => {nft.metadata = res})
         .then(res => {
             const options = {address: contract_addr, token_id: id, chain: "rinkeby"};
+            sleep(2000); // artificial delay to avoid error related to moralis constraints
             return Moralis.Web3API.token.getTokenIdOwners(options);
         })
         .then( (res) => {
